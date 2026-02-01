@@ -1,0 +1,107 @@
+import * as cdk from 'aws-cdk-lib';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as apigateway from 'aws-cdk-lib/aws-apigateway';
+import * as logs from 'aws-cdk-lib/aws-logs';
+import { Construct } from 'constructs';
+import * as path from 'path';
+
+export class BffStack extends cdk.Stack {
+  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+    super(scope, id, props);
+
+    // Import Tasks API URL from exports
+    const tasksApiUrl = cdk.Fn.importValue('ConceptoTasksApiUrl');
+
+    // Lambda function configuration
+    const lambdaEnvironment = {
+      TASKS_API_URL: tasksApiUrl,
+      LOG_LEVEL: 'info'
+    };
+
+    const lambdaProps = {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      timeout: cdk.Duration.seconds(30),
+      memorySize: 512,
+      environment: lambdaEnvironment,
+      logRetention: logs.RetentionDays.ONE_WEEK
+    };
+
+    // Lambda Functions
+    const createTaskFn = new lambda.Function(this, 'CreateTaskFunction', {
+      ...lambdaProps,
+      functionName: 'concepto-bff-create-task',
+      handler: 'tasks.handler.createTask',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../dist'))
+    });
+
+    const getTaskFn = new lambda.Function(this, 'GetTaskFunction', {
+      ...lambdaProps,
+      functionName: 'concepto-bff-get-task',
+      handler: 'tasks.handler.getTask',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../dist'))
+    });
+
+    const listTasksFn = new lambda.Function(this, 'ListTasksFunction', {
+      ...lambdaProps,
+      functionName: 'concepto-bff-list-tasks',
+      handler: 'tasks.handler.listTasks',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../dist'))
+    });
+
+    const updateTaskFn = new lambda.Function(this, 'UpdateTaskFunction', {
+      ...lambdaProps,
+      functionName: 'concepto-bff-update-task',
+      handler: 'tasks.handler.updateTask',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../dist'))
+    });
+
+    const deleteTaskFn = new lambda.Function(this, 'DeleteTaskFunction', {
+      ...lambdaProps,
+      functionName: 'concepto-bff-delete-task',
+      handler: 'tasks.handler.deleteTask',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../dist'))
+    });
+
+    // API Gateway
+    const api = new apigateway.RestApi(this, 'BffApi', {
+      restApiName: 'Concepto BFF API',
+      description: 'Backend for Frontend API for Concepto application',
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+        allowHeaders: [
+          'Content-Type',
+          'X-Amz-Date',
+          'Authorization',
+          'X-Api-Key',
+          'X-Amz-Security-Token'
+        ]
+      },
+      deployOptions: {
+        stageName: 'prod',
+        loggingLevel: apigateway.MethodLoggingLevel.INFO,
+        dataTraceEnabled: true,
+        metricsEnabled: true
+      }
+    });
+
+    // API Resources
+    const apiRoot = api.root.addResource('api');
+    const tasks = apiRoot.addResource('tasks');
+    const task = tasks.addResource('{id}');
+
+    // API Methods
+    tasks.addMethod('POST', new apigateway.LambdaIntegration(createTaskFn));
+    tasks.addMethod('GET', new apigateway.LambdaIntegration(listTasksFn));
+    task.addMethod('GET', new apigateway.LambdaIntegration(getTaskFn));
+    task.addMethod('PUT', new apigateway.LambdaIntegration(updateTaskFn));
+    task.addMethod('DELETE', new apigateway.LambdaIntegration(deleteTaskFn));
+
+    // Outputs
+    new cdk.CfnOutput(this, 'ApiUrl', {
+      value: api.url,
+      description: 'BFF API Gateway endpoint URL',
+      exportName: 'ConceptoBffApiUrl'
+    });
+  }
+}
