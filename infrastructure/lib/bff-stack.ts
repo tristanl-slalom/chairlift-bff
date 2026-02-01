@@ -30,35 +30,35 @@ export class BffStack extends cdk.Stack {
     const createTaskFn = new lambda.Function(this, 'CreateTaskFunction', {
       ...lambdaProps,
       functionName: 'concepto-bff-create-task',
-      handler: 'handlers/tasks.handler.createTask',
+      handler: 'handlers/create-task.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
     const getTaskFn = new lambda.Function(this, 'GetTaskFunction', {
       ...lambdaProps,
       functionName: 'concepto-bff-get-task',
-      handler: 'handlers/tasks.handler.getTask',
+      handler: 'handlers/get-task.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
     const listTasksFn = new lambda.Function(this, 'ListTasksFunction', {
       ...lambdaProps,
       functionName: 'concepto-bff-list-tasks',
-      handler: 'handlers/tasks.handler.listTasks',
+      handler: 'handlers/list-tasks.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
     const updateTaskFn = new lambda.Function(this, 'UpdateTaskFunction', {
       ...lambdaProps,
       functionName: 'concepto-bff-update-task',
-      handler: 'handlers/tasks.handler.updateTask',
+      handler: 'handlers/update-task.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
     const deleteTaskFn = new lambda.Function(this, 'DeleteTaskFunction', {
       ...lambdaProps,
       functionName: 'concepto-bff-delete-task',
-      handler: 'handlers/tasks.handler.deleteTask',
+      handler: 'handlers/delete-task.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
