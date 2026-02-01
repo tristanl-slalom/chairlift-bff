@@ -31,35 +31,35 @@ export class BffStack extends cdk.Stack {
       ...lambdaProps,
       functionName: 'concepto-bff-create-task',
       handler: 'handlers/tasks.handler.createTask',
-      code: lambda.Code.fromAsset(path.join(__dirname, '../../dist'))
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
     const getTaskFn = new lambda.Function(this, 'GetTaskFunction', {
       ...lambdaProps,
       functionName: 'concepto-bff-get-task',
       handler: 'handlers/tasks.handler.getTask',
-      code: lambda.Code.fromAsset(path.join(__dirname, '../../dist'))
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
     const listTasksFn = new lambda.Function(this, 'ListTasksFunction', {
       ...lambdaProps,
       functionName: 'concepto-bff-list-tasks',
       handler: 'handlers/tasks.handler.listTasks',
-      code: lambda.Code.fromAsset(path.join(__dirname, '../../dist'))
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
     const updateTaskFn = new lambda.Function(this, 'UpdateTaskFunction', {
       ...lambdaProps,
       functionName: 'concepto-bff-update-task',
       handler: 'handlers/tasks.handler.updateTask',
-      code: lambda.Code.fromAsset(path.join(__dirname, '../../dist'))
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
     const deleteTaskFn = new lambda.Function(this, 'DeleteTaskFunction', {
       ...lambdaProps,
       functionName: 'concepto-bff-delete-task',
       handler: 'handlers/tasks.handler.deleteTask',
-      code: lambda.Code.fromAsset(path.join(__dirname, '../../dist'))
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
     // API Gateway
