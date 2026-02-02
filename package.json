@@ -1,7 +1,7 @@
 {
-  "name": "concepto-bff",
+  "name": "@chairlift/bff",
   "version": "1.0.0",
-  "description": "Backend for Frontend service for Concepto application",
+  "description": "Backend for Frontend service for Chairlift application",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",

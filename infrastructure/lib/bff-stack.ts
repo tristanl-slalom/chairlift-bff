@@ -4,17 +4,32 @@ import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import { Construct } from 'constructs';
 import * as path from 'path';
+import { BranchConfig } from './branch-config';
+
+export interface BffStackProps extends cdk.StackProps {
+  branchConfig: BranchConfig;
+}
 
 export class BffStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props: BffStackProps) {
     super(scope, id, props);
 
-    // Import Tasks API URL from exports
-    const tasksApiUrl = cdk.Fn.importValue('ConceptoTasksApiUrl');
+    const { branchConfig } = props;
+
+    // Import all three backend service API URLs from CloudFormation exports (with branch awareness)
+    const flightsExportName = `ChairliftFlightsApiUrl${branchConfig.exportSuffix}`;
+    const customersExportName = `ChairliftCustomersApiUrl${branchConfig.exportSuffix}`;
+    const bookingsExportName = `ChairliftBookingsApiUrl${branchConfig.exportSuffix}`;
+
+    const flightsApiUrl = cdk.Fn.importValue(flightsExportName);
+    const customersApiUrl = cdk.Fn.importValue(customersExportName);
+    const bookingsApiUrl = cdk.Fn.importValue(bookingsExportName);
 
     // Lambda function configuration
     const lambdaEnvironment = {
-      TASKS_API_URL: tasksApiUrl,
+      FLIGHTS_API_URL: flightsApiUrl,
+      CUSTOMERS_API_URL: customersApiUrl,
+      BOOKINGS_API_URL: bookingsApiUrl,
       LOG_LEVEL: 'info'
     };
 
@@ -26,89 +41,70 @@ export class BffStack extends cdk.Stack {
       logRetention: logs.RetentionDays.ONE_WEEK
     };
 
-    // Lambda Functions
-    const createTaskFn = new lambda.Function(this, 'CreateTaskFunction', {
+    // Flights passthrough handlers
+    const searchFlightsFn = new lambda.Function(this, 'SearchFlightsFunction', {
       ...lambdaProps,
-      functionName: 'concepto-bff-create-task',
-      handler: 'handlers/create-task.handler',
+      functionName: `chairlift-bff-search-flights${branchConfig.stackSuffix}`,
+      handler: 'handlers/search-flights.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
-    const getTaskFn = new lambda.Function(this, 'GetTaskFunction', {
+    const getFlightFn = new lambda.Function(this, 'GetFlightFunction', {
       ...lambdaProps,
-      functionName: 'concepto-bff-get-task',
-      handler: 'handlers/get-task.handler',
+      functionName: `chairlift-bff-get-flight${branchConfig.stackSuffix}`,
+      handler: 'handlers/get-flight.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
-    const listTasksFn = new lambda.Function(this, 'ListTasksFunction', {
+    // Customers passthrough handlers
+    const getCustomerFn = new lambda.Function(this, 'GetCustomerFunction', {
       ...lambdaProps,
-      functionName: 'concepto-bff-list-tasks',
-      handler: 'handlers/list-tasks.handler',
+      functionName: `chairlift-bff-get-customer${branchConfig.stackSuffix}`,
+      handler: 'handlers/get-customer.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
-    const updateTaskFn = new lambda.Function(this, 'UpdateTaskFunction', {
+    const updateCustomerFn = new lambda.Function(this, 'UpdateCustomerFunction', {
       ...lambdaProps,
-      functionName: 'concepto-bff-update-task',
-      handler: 'handlers/update-task.handler',
+      functionName: `chairlift-bff-update-customer${branchConfig.stackSuffix}`,
+      handler: 'handlers/update-customer.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
-    const deleteTaskFn = new lambda.Function(this, 'DeleteTaskFunction', {
+    // Bookings passthrough handlers
+    const createBookingFn = new lambda.Function(this, 'CreateBookingFunction', {
       ...lambdaProps,
-      functionName: 'concepto-bff-delete-task',
-      handler: 'handlers/delete-task.handler',
+      functionName: `chairlift-bff-create-booking${branchConfig.stackSuffix}`,
+      handler: 'handlers/create-booking.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
-    // Status Config Lambda Functions
-    const createStatusFn = new lambda.Function(this, 'CreateStatusFunction', {
+    const listCustomerBookingsFn = new lambda.Function(this, 'ListCustomerBookingsFunction', {
       ...lambdaProps,
-      functionName: 'concepto-bff-create-status',
-      handler: 'handlers/status-config-handler.createStatus',
+      functionName: `chairlift-bff-list-customer-bookings${branchConfig.stackSuffix}`,
+      handler: 'handlers/list-customer-bookings.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
-    const getStatusFn = new lambda.Function(this, 'GetStatusFunction', {
+    // Aggregated endpoint handlers
+    const getBookingDetailsFn = new lambda.Function(this, 'GetBookingDetailsFunction', {
       ...lambdaProps,
-      functionName: 'concepto-bff-get-status',
-      handler: 'handlers/status-config-handler.getStatus',
+      functionName: `chairlift-bff-get-booking-details${branchConfig.stackSuffix}`,
+      handler: 'handlers/get-booking-details.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
-    const listStatusesFn = new lambda.Function(this, 'ListStatusesFunction', {
+    const getCustomerDashboardFn = new lambda.Function(this, 'GetCustomerDashboardFunction', {
       ...lambdaProps,
-      functionName: 'concepto-bff-list-statuses',
-      handler: 'handlers/status-config-handler.listStatuses',
-      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
-    });
-
-    const updateStatusFn = new lambda.Function(this, 'UpdateStatusFunction', {
-      ...lambdaProps,
-      functionName: 'concepto-bff-update-status',
-      handler: 'handlers/status-config-handler.updateStatus',
-      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
-    });
-
-    const deleteStatusFn = new lambda.Function(this, 'DeleteStatusFunction', {
-      ...lambdaProps,
-      functionName: 'concepto-bff-delete-status',
-      handler: 'handlers/status-config-handler.deleteStatus',
-      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
-    });
-
-    const reorderStatusesFn = new lambda.Function(this, 'ReorderStatusesFunction', {
-      ...lambdaProps,
-      functionName: 'concepto-bff-reorder-statuses',
-      handler: 'handlers/status-config-handler.reorderStatuses',
+      functionName: `chairlift-bff-get-customer-dashboard${branchConfig.stackSuffix}`,
+      handler: 'handlers/get-customer-dashboard.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
     // API Gateway
     const api = new apigateway.RestApi(this, 'BffApi', {
-      restApiName: 'Concepto BFF API',
-      description: 'Backend for Frontend API for Concepto application',
+      restApiName: `Chairlift BFF API${branchConfig.stackSuffix}`,
+      description: `Backend for Frontend API for Chairlift application (branch: ${branchConfig.branchName})`,
       defaultCorsPreflightOptions: {
         allowOrigins: apigateway.Cors.ALL_ORIGINS,
         allowMethods: apigateway.Cors.ALL_METHODS,
@@ -130,32 +126,47 @@ export class BffStack extends cdk.Stack {
 
     // API Resources
     const apiRoot = api.root.addResource('api');
-    const tasks = apiRoot.addResource('tasks');
-    const task = tasks.addResource('{id}');
-    const statuses = apiRoot.addResource('statuses');
-    const status = statuses.addResource('{statusKey}');
-    const reorder = statuses.addResource('reorder');
 
-    // Task API Methods
-    tasks.addMethod('POST', new apigateway.LambdaIntegration(createTaskFn));
-    tasks.addMethod('GET', new apigateway.LambdaIntegration(listTasksFn));
-    task.addMethod('GET', new apigateway.LambdaIntegration(getTaskFn));
-    task.addMethod('PUT', new apigateway.LambdaIntegration(updateTaskFn));
-    task.addMethod('DELETE', new apigateway.LambdaIntegration(deleteTaskFn));
+    // Flights resources
+    const flights = apiRoot.addResource('flights');
+    const flightsSearch = flights.addResource('search');
+    const flight = flights.addResource('{id}');
 
-    // Status Config API Methods
-    statuses.addMethod('POST', new apigateway.LambdaIntegration(createStatusFn));
-    statuses.addMethod('GET', new apigateway.LambdaIntegration(listStatusesFn));
-    status.addMethod('GET', new apigateway.LambdaIntegration(getStatusFn));
-    status.addMethod('PUT', new apigateway.LambdaIntegration(updateStatusFn));
-    status.addMethod('DELETE', new apigateway.LambdaIntegration(deleteStatusFn));
-    reorder.addMethod('POST', new apigateway.LambdaIntegration(reorderStatusesFn));
+    // Customers resources
+    const customers = apiRoot.addResource('customers');
+    const customer = customers.addResource('{id}');
+    const customerDashboard = customer.addResource('dashboard');
+
+    // Bookings resources
+    const bookings = apiRoot.addResource('bookings');
+    const booking = bookings.addResource('{id}');
+    const bookingDetails = booking.addResource('details');
+    const bookingsCustomer = bookings.addResource('customer');
+    const customerBookings = bookingsCustomer.addResource('{customerId}');
+
+    // Flights API Methods
+    flightsSearch.addMethod('GET', new apigateway.LambdaIntegration(searchFlightsFn));
+    flight.addMethod('GET', new apigateway.LambdaIntegration(getFlightFn));
+
+    // Customers API Methods
+    customer.addMethod('GET', new apigateway.LambdaIntegration(getCustomerFn));
+    customer.addMethod('PUT', new apigateway.LambdaIntegration(updateCustomerFn));
+    customerDashboard.addMethod('GET', new apigateway.LambdaIntegration(getCustomerDashboardFn));
+
+    // Bookings API Methods
+    bookings.addMethod('POST', new apigateway.LambdaIntegration(createBookingFn));
+    bookingDetails.addMethod('GET', new apigateway.LambdaIntegration(getBookingDetailsFn));
+    customerBookings.addMethod('GET', new apigateway.LambdaIntegration(listCustomerBookingsFn));
+
+    // Tag all resources with branch information
+    cdk.Tags.of(this).add('Branch', branchConfig.branchName);
+    cdk.Tags.of(this).add('ManagedBy', 'CDK');
 
     // Outputs
     new cdk.CfnOutput(this, 'ApiUrl', {
       value: api.url,
-      description: 'BFF API Gateway endpoint URL',
-      exportName: 'ConceptoBffApiUrl'
+      description: `BFF API Gateway endpoint URL (branch: ${branchConfig.branchName})`,
+      exportName: `ChairliftBFFApiUrl${branchConfig.exportSuffix}`
     });
   }
 }

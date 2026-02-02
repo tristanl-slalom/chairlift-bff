@@ -1,0 +1,28 @@
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { flightsApiClient } from '../clients/flights-api.client';
+import { createSuccessResponse, createErrorResponse } from '../utils/response';
+import logger from '../utils/logger';
+
+export const handler = async (
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> => {
+  try {
+    const flightId = event.pathParameters?.id;
+
+    if (!flightId) {
+      return createErrorResponse('Flight ID is required', 400);
+    }
+
+    logger.info('Getting flight', { flightId });
+
+    const flight = await flightsApiClient.getFlight(flightId);
+
+    return createSuccessResponse(flight);
+  } catch (error) {
+    logger.error('Error getting flight', { error });
+    return createErrorResponse(
+      error instanceof Error ? error.message : 'Failed to get flight',
+      500
+    );
+  }
+};
