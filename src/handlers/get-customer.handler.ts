@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { customersApiClient } from '../clients/customers-api.client';
-import { createSuccessResponse, createErrorResponse } from '../utils/response';
+import { successResponse, errorResponse } from '../utils/response';
 import logger from '../utils/logger';
 
 export const handler = async (
@@ -10,17 +10,17 @@ export const handler = async (
     const customerId = event.pathParameters?.id;
 
     if (!customerId) {
-      return createErrorResponse('Customer ID is required', 400);
+      return errorResponse('Customer ID is required', 400);
     }
 
     logger.info('Getting customer', { customerId });
 
     const customer = await customersApiClient.getCustomer(customerId);
 
-    return createSuccessResponse(customer);
+    return successResponse(customer);
   } catch (error) {
     logger.error('Error getting customer', { error });
-    return createErrorResponse(
+    return errorResponse(
       error instanceof Error ? error.message : 'Failed to get customer',
       500
     );

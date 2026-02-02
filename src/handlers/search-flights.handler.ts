@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { flightsApiClient } from '../clients/flights-api.client';
-import { createSuccessResponse, createErrorResponse } from '../utils/response';
+import { successResponse, errorResponse } from '../utils/response';
 import logger from '../utils/logger';
 
 export const handler = async (
@@ -17,10 +17,10 @@ export const handler = async (
       departureDate
     );
 
-    return createSuccessResponse(flights);
+    return successResponse(flights);
   } catch (error) {
     logger.error('Error searching flights', { error });
-    return createErrorResponse(
+    return errorResponse(
       error instanceof Error ? error.message : 'Failed to search flights',
       500
     );

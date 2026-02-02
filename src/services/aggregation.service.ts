@@ -6,7 +6,6 @@ import {
   CustomerDashboard,
   FlightWithAvailability
 } from '../types/aggregated.types';
-import { Flight } from '../types/flight.types';
 import logger from '../utils/logger';
 
 export class AggregationService {

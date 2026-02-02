@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { customersApiClient } from '../clients/customers-api.client';
-import { createSuccessResponse, createErrorResponse } from '../utils/response';
+import { successResponse, errorResponse } from '../utils/response';
 import logger from '../utils/logger';
 
 export const handler = async (
@@ -10,11 +10,11 @@ export const handler = async (
     const customerId = event.pathParameters?.id;
 
     if (!customerId) {
-      return createErrorResponse('Customer ID is required', 400);
+      return errorResponse('Customer ID is required', 400);
     }
 
     if (!event.body) {
-      return createErrorResponse('Request body is required', 400);
+      return errorResponse('Request body is required', 400);
     }
 
     const updateRequest = JSON.parse(event.body);
@@ -26,10 +26,10 @@ export const handler = async (
       updateRequest
     );
 
-    return createSuccessResponse(customer);
+    return successResponse(customer);
   } catch (error) {
     logger.error('Error updating customer', { error });
-    return createErrorResponse(
+    return errorResponse(
       error instanceof Error ? error.message : 'Failed to update customer',
       500
     );
