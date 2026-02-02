@@ -66,42 +66,42 @@ export class BffStack extends cdk.Stack {
     const createStatusFn = new lambda.Function(this, 'CreateStatusFunction', {
       ...lambdaProps,
       functionName: 'concepto-bff-create-status',
-      handler: 'handlers/status-config.handler.createStatus',
+      handler: 'handlers/status-config-handler.createStatus',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
     const getStatusFn = new lambda.Function(this, 'GetStatusFunction', {
       ...lambdaProps,
       functionName: 'concepto-bff-get-status',
-      handler: 'handlers/status-config.handler.getStatus',
+      handler: 'handlers/status-config-handler.getStatus',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
     const listStatusesFn = new lambda.Function(this, 'ListStatusesFunction', {
       ...lambdaProps,
       functionName: 'concepto-bff-list-statuses',
-      handler: 'handlers/status-config.handler.listStatuses',
+      handler: 'handlers/status-config-handler.listStatuses',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
     const updateStatusFn = new lambda.Function(this, 'UpdateStatusFunction', {
       ...lambdaProps,
       functionName: 'concepto-bff-update-status',
-      handler: 'handlers/status-config.handler.updateStatus',
+      handler: 'handlers/status-config-handler.updateStatus',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
     const deleteStatusFn = new lambda.Function(this, 'DeleteStatusFunction', {
       ...lambdaProps,
       functionName: 'concepto-bff-delete-status',
-      handler: 'handlers/status-config.handler.deleteStatus',
+      handler: 'handlers/status-config-handler.deleteStatus',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
     const reorderStatusesFn = new lambda.Function(this, 'ReorderStatusesFunction', {
       ...lambdaProps,
       functionName: 'concepto-bff-reorder-statuses',
-      handler: 'handlers/status-config.handler.reorderStatuses',
+      handler: 'handlers/status-config-handler.reorderStatuses',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
