@@ -2,7 +2,7 @@ export interface Task {
   id: string;
   title: string;
   description: string;
-  status: 'TODO' | 'IN_PROGRESS' | 'DONE';
+  status: string; // Changed from enum to string for dynamic statuses
   createdAt: string;
   updatedAt: string;
 }
@@ -10,13 +10,13 @@ export interface Task {
 export interface CreateTaskRequest {
   title: string;
   description: string;
-  status?: 'TODO' | 'IN_PROGRESS' | 'DONE';
+  status?: string; // Changed from enum to string for dynamic statuses
 }
 
 export interface UpdateTaskRequest {
   title?: string;
   description?: string;
-  status?: 'TODO' | 'IN_PROGRESS' | 'DONE';
+  status?: string; // Changed from enum to string for dynamic statuses
 }
 
 export interface TasksApiResponse<T> {
