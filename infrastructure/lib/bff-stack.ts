@@ -45,14 +45,14 @@ export class BffStack extends cdk.Stack {
     const searchFlightsFn = new lambda.Function(this, 'SearchFlightsFunction', {
       ...lambdaProps,
       functionName: `chairlift-bff-search-flights${branchConfig.stackSuffix}`,
-      handler: 'handlers/search-flights.handler.handler',
+      handler: 'handlers/search-flights.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
     const getFlightFn = new lambda.Function(this, 'GetFlightFunction', {
       ...lambdaProps,
       functionName: `chairlift-bff-get-flight${branchConfig.stackSuffix}`,
-      handler: 'handlers/get-flight.handler.handler',
+      handler: 'handlers/get-flight.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
@@ -60,14 +60,14 @@ export class BffStack extends cdk.Stack {
     const getCustomerFn = new lambda.Function(this, 'GetCustomerFunction', {
       ...lambdaProps,
       functionName: `chairlift-bff-get-customer${branchConfig.stackSuffix}`,
-      handler: 'handlers/get-customer.handler.handler',
+      handler: 'handlers/get-customer.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
     const updateCustomerFn = new lambda.Function(this, 'UpdateCustomerFunction', {
       ...lambdaProps,
       functionName: `chairlift-bff-update-customer${branchConfig.stackSuffix}`,
-      handler: 'handlers/update-customer.handler.handler',
+      handler: 'handlers/update-customer.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
@@ -75,14 +75,14 @@ export class BffStack extends cdk.Stack {
     const createBookingFn = new lambda.Function(this, 'CreateBookingFunction', {
       ...lambdaProps,
       functionName: `chairlift-bff-create-booking${branchConfig.stackSuffix}`,
-      handler: 'handlers/create-booking.handler.handler',
+      handler: 'handlers/create-booking.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
     const listCustomerBookingsFn = new lambda.Function(this, 'ListCustomerBookingsFunction', {
       ...lambdaProps,
       functionName: `chairlift-bff-list-customer-bookings${branchConfig.stackSuffix}`,
-      handler: 'handlers/list-customer-bookings.handler.handler',
+      handler: 'handlers/list-customer-bookings.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
@@ -90,14 +90,14 @@ export class BffStack extends cdk.Stack {
     const getBookingDetailsFn = new lambda.Function(this, 'GetBookingDetailsFunction', {
       ...lambdaProps,
       functionName: `chairlift-bff-get-booking-details${branchConfig.stackSuffix}`,
-      handler: 'handlers/get-booking-details.handler.handler',
+      handler: 'handlers/get-booking-details.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
     const getCustomerDashboardFn = new lambda.Function(this, 'GetCustomerDashboardFunction', {
       ...lambdaProps,
       functionName: `chairlift-bff-get-customer-dashboard${branchConfig.stackSuffix}`,
-      handler: 'handlers/get-customer-dashboard.handler.handler',
+      handler: 'handlers/get-customer-dashboard.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 

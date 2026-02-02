@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
-import { handler } from './get-booking-details.handler';
+import { handler } from './get-booking-details';
 import { AggregationService } from '../services/aggregation.service';
 
 // Mock the aggregation service
