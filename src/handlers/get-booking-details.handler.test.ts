@@ -1,5 +1,6 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import { handler } from './get-booking-details.handler';
+import { AggregationService } from '../services/aggregation.service';
 
 // Mock the aggregation service
 jest.mock('../services/aggregation.service');
@@ -64,8 +65,7 @@ describe('get-booking-details handler', () => {
     };
 
     // Mock the AggregationService
-    const { AggregationService } = require('../services/aggregation.service');
-    AggregationService.prototype.getBookingDetails = jest.fn().mockResolvedValue(mockBookingDetails);
+    (AggregationService.prototype.getBookingDetails as jest.Mock) = jest.fn().mockResolvedValue(mockBookingDetails);
 
     const result = await handler(mockEvent as APIGatewayProxyEvent);
 

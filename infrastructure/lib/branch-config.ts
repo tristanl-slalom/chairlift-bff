@@ -29,7 +29,7 @@ export function detectBranchName(): string {
       .execSync('git rev-parse --abbrev-ref HEAD', { encoding: 'utf8' })
       .trim();
     return branch;
-  } catch (error) {
+  } catch {
     console.warn('Unable to detect branch from git, defaulting to "main"');
     return 'main';
   }
