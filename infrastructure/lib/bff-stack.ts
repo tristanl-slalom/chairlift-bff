@@ -62,6 +62,49 @@ export class BffStack extends cdk.Stack {
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
     });
 
+    // Status Config Lambda Functions
+    const createStatusFn = new lambda.Function(this, 'CreateStatusFunction', {
+      ...lambdaProps,
+      functionName: 'concepto-bff-create-status',
+      handler: 'handlers/status-config.createStatus',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
+    });
+
+    const getStatusFn = new lambda.Function(this, 'GetStatusFunction', {
+      ...lambdaProps,
+      functionName: 'concepto-bff-get-status',
+      handler: 'handlers/status-config.getStatus',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
+    });
+
+    const listStatusesFn = new lambda.Function(this, 'ListStatusesFunction', {
+      ...lambdaProps,
+      functionName: 'concepto-bff-list-statuses',
+      handler: 'handlers/status-config.listStatuses',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
+    });
+
+    const updateStatusFn = new lambda.Function(this, 'UpdateStatusFunction', {
+      ...lambdaProps,
+      functionName: 'concepto-bff-update-status',
+      handler: 'handlers/status-config.updateStatus',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
+    });
+
+    const deleteStatusFn = new lambda.Function(this, 'DeleteStatusFunction', {
+      ...lambdaProps,
+      functionName: 'concepto-bff-delete-status',
+      handler: 'handlers/status-config.deleteStatus',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
+    });
+
+    const reorderStatusesFn = new lambda.Function(this, 'ReorderStatusesFunction', {
+      ...lambdaProps,
+      functionName: 'concepto-bff-reorder-statuses',
+      handler: 'handlers/status-config.reorderStatuses',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-dist'))
+    });
+
     // API Gateway
     const api = new apigateway.RestApi(this, 'BffApi', {
       restApiName: 'Concepto BFF API',
@@ -89,13 +132,24 @@ export class BffStack extends cdk.Stack {
     const apiRoot = api.root.addResource('api');
     const tasks = apiRoot.addResource('tasks');
     const task = tasks.addResource('{id}');
+    const statuses = apiRoot.addResource('statuses');
+    const status = statuses.addResource('{statusKey}');
+    const reorder = statuses.addResource('reorder');
 
-    // API Methods
+    // Task API Methods
     tasks.addMethod('POST', new apigateway.LambdaIntegration(createTaskFn));
     tasks.addMethod('GET', new apigateway.LambdaIntegration(listTasksFn));
     task.addMethod('GET', new apigateway.LambdaIntegration(getTaskFn));
     task.addMethod('PUT', new apigateway.LambdaIntegration(updateTaskFn));
     task.addMethod('DELETE', new apigateway.LambdaIntegration(deleteTaskFn));
+
+    // Status Config API Methods
+    statuses.addMethod('POST', new apigateway.LambdaIntegration(createStatusFn));
+    statuses.addMethod('GET', new apigateway.LambdaIntegration(listStatusesFn));
+    status.addMethod('GET', new apigateway.LambdaIntegration(getStatusFn));
+    status.addMethod('PUT', new apigateway.LambdaIntegration(updateStatusFn));
+    status.addMethod('DELETE', new apigateway.LambdaIntegration(deleteStatusFn));
+    reorder.addMethod('POST', new apigateway.LambdaIntegration(reorderStatusesFn));
 
     // Outputs
     new cdk.CfnOutput(this, 'ApiUrl', {
