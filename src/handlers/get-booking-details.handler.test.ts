@@ -64,8 +64,8 @@ describe('get-booking-details handler', () => {
       }
     };
 
-    // Mock the AggregationService
-    (AggregationService.prototype.getBookingDetails as jest.Mock) = jest.fn().mockResolvedValue(mockBookingDetails);
+    // Mock the AggregationService method
+    jest.spyOn(AggregationService.prototype, 'getBookingDetails').mockResolvedValue(mockBookingDetails);
 
     const result = await handler(mockEvent as APIGatewayProxyEvent);
 
