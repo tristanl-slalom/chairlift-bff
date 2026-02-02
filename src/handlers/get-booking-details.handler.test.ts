@@ -71,6 +71,6 @@ describe('get-booking-details handler', () => {
 
     expect(result.statusCode).toBe(200);
     const body = JSON.parse(result.body);
-    expect(body.data).toEqual(mockBookingDetails);
+    expect(body).toEqual(mockBookingDetails);
   });
 });

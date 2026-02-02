@@ -1,8 +1,21 @@
 import axios from 'axios';
-import { FlightsApiClient } from './flights-api.client';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
+
+// Mock axios.create before importing the client to prevent module-level instantiation errors
+mockedAxios.create = jest.fn().mockReturnValue({
+  get: jest.fn(),
+  post: jest.fn(),
+  put: jest.fn(),
+  delete: jest.fn(),
+  interceptors: {
+    request: { use: jest.fn() },
+    response: { use: jest.fn() }
+  }
+} as any);
+
+import { FlightsApiClient } from './flights-api.client';
 
 describe('FlightsApiClient', () => {
   let client: FlightsApiClient;
